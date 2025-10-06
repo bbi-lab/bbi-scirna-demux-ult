@@ -79,7 +79,7 @@ def get_data_file_dict(json_data):
   return(data_file_dict)
 
 
-def make_data_file_json(data_file_dict):
+def make_data_file_json(data_file_dict, cram_file_dir):
   cram2bam_list = []
   for process_group in data_file_dict.keys():
     for pcr_pair in data_file_dict.keys():
@@ -87,9 +87,10 @@ def make_data_file_json(data_file_dict):
       (iplate, irow, icol) = index2well_by_col(pcr_pair[1])
       well = '%02d%s' % (icol+1, 'ABDCDEFGH'[irow])
       root_file = 'PA_%s_Z%04d' % (well, pcr_pair[1])
-      in_file = '%s.cram' % (root_file)
+      in_file = '%s/%s.cram' % (cram_file_dir, root_file)
+      in_path = os.path.join(cram_file_dir, in_file) 
       merge_dict['root_file'] = root_file
-      merge_dict['in_file'] = in_file
+      merge_dict['in_file'] = in_path
       cram2bam_list.append(merge_dict)
 
   try:
@@ -104,6 +105,7 @@ def make_data_file_json(data_file_dict):
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='A program to make JSON file for cram2bam.')
   parser.add_argument('-i', '--input', required=True, default=None, help='Input JSON samplesheet filename (required string).')
+  parser.add_argument('-d', '--cram_dir', required=True, default=None, help='CRAM file directory path.')
   parser.add_argument('-v', '--version', action='version', version=program_version)
   args = parser.parse_args()
 
@@ -113,5 +115,5 @@ if __name__ == '__main__':
   json_data = read_json(args.input)
   data_file_dict = get_data_file_dict(json_data)
 
-  make_data_file_json(data_file_dict)
+  make_data_file_json(data_file_dict, args.cram_dir)
 
