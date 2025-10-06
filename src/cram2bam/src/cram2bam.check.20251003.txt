@@ -1,0 +1,105 @@
+** input cram file first two records
+nell> samtools view /home/brent/work/ultima_data/chengxiangs_crams/PB-01A-Z0001.ucram  | head -n 2
+410097_1-Z0001-0000002437       4       *       0       0       *       *       0       0       CAAACCTTCTGCTGGCTGTCCTCGCTGCCACTGAGCCTTGTCTGTTCTTCTCTTGATACTGATTCTGGGCTCTGAAATCAAATGCAGCAC      4*:*::**2::'0::-D4:::$:D:D:::DDD:::::::**:D:**:::'$2--$'0'D::2--:2*:**$$:*:::**:D:-2'*:2D*      tp:B:c,-1,-1,1,-1,1,1,1,1,1,-1,1,1,1,1,1,1,0,1,1,-1,-1,1,1,-1,1,0,1,1,1,1,1,0,1,1,-1,-1,-1,1,1,1,1,1,1,1,1,1,1,-1,-1,1,1,1,1,1,1,-1,-1,1,1,-1,1,1,1,1,1,1,-1,1,-1,1,1,1,1,1,1,-1,1,1,1,1,-1,1,1,1,1,-1,1,1,1,1  t0:Z::*****::DDDDDDDDDDDDDD**DDDDDDDDDDDDDDD::DDDDDDDD44DDDDD**:DDDDD::DDD00DD::::DDDDDDDDDDD00 rq:f:0.85       pr:i:1  pt:i:7 px:i:2662        py:i:482        si:i:181        tm:Z:AQ ba:Z:CCTGAATACT UM:Z:GCAGGATT   bb:Z:TAGATCTACT a3:i:170        RG:Z:Z0001
+410097_1-Z0001-0000003242       4       *       0       0       *       *       0       0       ACTCAATCAGCTTACCCATTTCTTCACCTATAACTTTCAGCTCTACCATTATAGTATAGAACCCAGAGGACAAACT    :D0*--*':DD:::0D0:::::''0:DDD:D22D*:*DDDDDDD*--$--:DDDD:D:D:::::DD:22:D:::DD    tp:B:c,1,1,1,1,1,1,1,1,-1,1,1,1,1,1,1,0,1,-1,1,-1,1,1,1,1,1,1,1,1,0,1,1,1,1,0,1,2,1,1,-1,0,1,1,1,1,1,1,1,1,-1,-1,1,1,0,0,0,1,1,1,1,1,1,-1,1,-1,1,1,1,1,1,1,0,1,2,1,1,1  t0:Z::44DDDDDDDDDD4444DDDD:::DDDDDDDDDDDDDDDDDDDD000DDDDDDDDDD::00000DD:::DDDDDDD       rq:f:0.98       pr:i:1  pt:i:7  px:i:7990       py:i:489        si:i:256        ba:Z:GTTCGTCGTT UM:Z:CTTTTGTT  bb:Z:TACCTAATCA  a3:i:152        tm:Z:A  RG:Z:Z0001
+
+
+** output bam files records
+nell> samtools view E18.75.L1.01-001_000_001-L001.bam
+E18.75.L1.01-P5P01-A01-P7none_1|E18.75.L1.01|P01-A01|none|P01_A10_LIG656|GCAGGATT       4       *       0       0       *       *       0       0       CAAACCTTCTGCTGGCTGTCCTCGCTGCCACTGAGCCTTGTCTGTTCTTCTCTTGATACTGATTCTGGGCTCTGAAATCAAATGCAGCAC       4*:*::**2::'0::-D4:::$:D:D:::DDD:::::::**:D:**:::'$2--$'0'D::2--:2*:**$$:*:::**:D:-2'*:2D*      CB:Z:AAAAAGGAAGGCAAAAAAAAAAAAAAAC       CY:Z:CCCCCCCCCCCCCCCCCCCCCCCCCCCCUB:Z:GCAGGATT   UY:Z:CCCCCCCC
+nell> samtools view P0.L1.04-001_000_001-L001.bam
+P0.L1.04-P5P01-A01-P7none_2|P0.L1.04|P01-A01|none|P06_B12_LIG25|CTTTTGTT        4       *       0       0       *       *       0       0       ACTCAATCAGCTTACCCATTTCTTCACCTATAACTTTCAGCTCTACCATTATAGTATAGAACCCAGAGGACAAACT     :D0*--*':DD:::0D0:::::''0:DDD:D22D*:*DDDDDDD*--$--:DDDD:D:D:::::DD:22:D:::DD    CB:Z:AACTTGAAAAACGCAAAAAAAAAAAAAC       CY:Z:CCCCCCCCCCCCCCCCCCCCCCCCCCCC       UB:Z:CTTTTGTT   UY:Z:CCCCCCCC
+
+
+cram 1 seq: CAAACCTTCTGCTGGCTGTCCTCGCTGCCACTGAGCCTTGTCTGTTCTTCTCTTGATACTGATTCTGGGCTCTGAAATCAAATGCAGCAC
+bam 1 seq:  CAAACCTTCTGCTGGCTGTCCTCGCTGCCACTGAGCCTTGTCTGTTCTTCTCTTGATACTGATTCTGGGCTCTGAAATCAAATGCAGCAC
+
+cram 1 qual: 4*:*::**2::'0::-D4:::$:D:D:::DDD:::::::**:D:**:::'$2--$'0'D::2--:2*:**$$:*:::**:D:-2'*:2D*
+bam 1 qual:  4*:*::**2::'0::-D4:::$:D:D:::DDD:::::::**:D:**:::'$2--$'0'D::2--:2*:**$$:*:::**:D:-2'*:2D*
+
+
+cram 2 seq: ACTCAATCAGCTTACCCATTTCTTCACCTATAACTTTCAGCTCTACCATTATAGTATAGAACCCAGAGGACAAACT
+bam 2 seq:  ACTCAATCAGCTTACCCATTTCTTCACCTATAACTTTCAGCTCTACCATTATAGTATAGAACCCAGAGGACAAACT
+
+cram 2 qual: :D0*--*':DD:::0D0:::::''0:DDD:D22D*:*DDDDDDD*--$--:DDDD:D:D:::::DD:22:D:::DD
+bam 2 qual:  :D0*--*':DD:::0D0:::::''0:DDD:D22D*:*DDDDDDD*--$--:DDDD:D:D:::::DD:22:D:::DD
+
+
+# tag bb: rt barcode
+# tag ba: lig barcode
+# tag UM: UMI sequence
+
+
+cram 1 bb: TAGATCTACT
+cram 1 ba: CCTGAATACT
+cram 1 UM: GCAGGATT
+
+cram 1  rt well: P01-A10
+cram 1 lig well: LIG656
+
+cram 1  rt index: 10
+cram 1 lig index: 656
+
+cram 1  rt base 4: 22
+cram 1 lig base 4: 22100
+
+cram 1  rt encoded: AAAAAGG
+cram 1 lig encoded: AAGGCAA
+
+cram 1 sample name (RT barcode file): P1-A10,TAGATCTACT,E18.75_L1-01
+
+
+cram 2 bb: TACCTAATCA
+cram 2 ba: GTTCGTCGTT
+cram 2 UM: CTTTTGTT
+
+cram 2  rt well: P06-B12
+cram 2 lig well: LIG25
+
+cram 2  rt index: 504
+cram 2 lig index: 25
+
+cram 2  rt base 4: 13320
+cram 2 lig base 4: 121
+
+cram 2  rt encoded: AACTTGA
+cram 2 lig encoded: AAAACGC
+
+cram 2 sample name (RT barcode file): P6-B12,TACCTAATCA,P0_L1-04
+
+
+let read_name: String = format!("{}-P5{}-P7{}_{}|{}|{}|{}|{}_{}|{}", sample_name,
+                                                                     p5_well_name,
+                                                                     p7_well_name,
+                                                                     nrecord,
+                                                                     sample_name,
+                                                                     p5_well_name,
+                                                                     p7_well_name,
+                                                                     rt_well_name,
+                                                                     lig_well_name,
+                                                                     umi_seq_string);
+
+let cell_barcode_string: String = format!("{:A>7}{:A>7}{:A>7}{:A>7}",
+                                              rt_index_encoded,
+                                              lig_index_encoded,
+                                              p7_index_encoded,
+                                              p5_index_encoded);
+
+
+pcr7 index encoded: AAAAAAA
+
+pcr5 index encoded: AAAAAAC
+
+
+bam 1 UM: GCAGGATT
+
+bam 2 UM: CTTTTGTT
+
+** indices to encoded cell barcode
+cram 1 cell barcode: AAAAAGGAAGGCAA AAAAAAAAAAAAAC
+bam 1 cell barcode:  AAAAAGGAAGGCAA AAAAAAAAAAAAAC
+
+cram 2 cell barcode: AACTTGAAAAACGC AAAAAAAAAAAAAC
+bam 2 cell barcode:  AACTTGAAAAACGC AAAAAAAAAAAAAC
+
+

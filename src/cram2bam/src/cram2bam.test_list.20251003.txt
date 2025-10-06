@@ -1,0 +1,29 @@
+check
+  o  sequence
+  o  quality values
+  o  RT sequence
+  o  ligation sequence
+  o  UMI sequence
+  o  PCR index
+  o  RT index
+  o  ligation index
+  o  sample name
+  o  index to well conversion
+       o  RT
+       o  ligation
+       o  pcr7
+       o  pcr5
+  o  read header
+  o  file name
+  o  cell barcode string
+       o  RT encoding
+       o  ligation encoding
+       o  pcr7 encoding
+       o  pcr5 encoding
+  o  threading (ncpu)
+  o  samplesheet (json)
+       o  RT file use
+       o  ligation file use
+       o  pcr7 file use
+       o  pcr5 file use
+
