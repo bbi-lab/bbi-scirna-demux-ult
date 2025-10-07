@@ -90,6 +90,10 @@ fn set_cl_options() -> Result<clap::Command, Box<dyn std::error::Error>> {
 }
 
 
+/*
+** Convert a well index to a plate and well. Well index 0 is 'none', which may be used
+** as a PCR well index. The well is returned as a string.
+*/
 pub fn index_to_well(mut well_index: usize, across_row_first: bool) -> Result<(usize, String), Error> {
 
   /*
@@ -146,12 +150,19 @@ fn make_well_index_map(max_index: usize, across_row_first: bool, with_plate: boo
 }
 
 
+/*
+** Make a hashmap to convert an RT plate+well string to a well index. The wells
+** 'increase' across rows as the well index increments.
+*/
 fn make_rt_well_to_index_map(max_num_plates: usize) -> Result<HashMap<String, usize>, Error> {
   let plate_well_index_map_by_row = make_well_index_map(max_num_plates * 96 + 1, true, true).unwrap();
   Ok(plate_well_index_map_by_row)
 }
 
 
+/*
+** Make a vector that maps an RT well index to a plate + well string.
+*/
 fn make_rt_index_to_well_map(max_num_plates: usize) -> Result<Vec<String>, Error> {
   let mut rt_index_to_well_map: Vec<String> = Vec::with_capacity(max_num_plates * 96 + 1);
   rt_index_to_well_map.push("Undetermined".to_string());
@@ -165,6 +176,10 @@ fn make_rt_index_to_well_map(max_num_plates: usize) -> Result<Vec<String>, Error
 }
 
 
+/*
+** Make a HashMap to convert a ligation oligo name to an index. The index is
+** embedded in the oligo name.
+*/
 fn make_lig_well_to_index_map(max_num_plates: usize) -> Result<HashMap<String, usize>, Error> {
   let mut lig_well_to_index_map: HashMap<String, usize> = HashMap::with_capacity(max_num_plates * 96 + 1);
 
@@ -265,6 +280,10 @@ fn make_index_vec(index_str: &str) -> Result<Vec<usize>, Error> {
 }
 
 
+/*
+** Split the samplesheet ranges string to rt, ligation, pcr7, and pcr5 index strings.
+** Convert the index strings to vectors of individual indices.
+*/
 fn get_sample_index_vecs(sample_map: &SampleMap) -> Result<(Vec<usize>, Vec<usize>, Vec<usize>, Vec<usize>), Error> {
   let lane_index_vec: Vec<usize> = make_index_vec(&sample_map.lanes).unwrap();
 
@@ -294,6 +313,12 @@ fn deserialize_sample_map(serialized_sample_map: serde_json::Value) -> Result<Sa
 }
 
 
+/*
+** Read the input samplesheet json file and extract the sample index list.
+** Select the sample index maps that match the lane, pcr7, and pcr5
+** indices that 'belong to' the input cram file. Return a vector of these
+** selected maps.
+*/
 fn get_input_file_samples(samplesheet_filename: &str, lane_index: usize, p7_index: usize, p5_index: usize) -> Result<Vec<SampleMap>, Error> {
   /*
   ** Read samplesheet JSON file.
@@ -394,6 +419,10 @@ pub fn read_barcode_file(file_path: &str) -> Result<HashMap<String, String>, std
 }
 
 
+/*
+** Read a barcode file (RT or ligation) and return a HashMap where the keys are the
+** barcode sequences and the values are the well indices.
+*/
 fn make_barcode_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, default_filename: &str) -> Result<HashMap<String, usize>, Error> {
   /* 
   ** Find barcode file path.
@@ -490,6 +519,10 @@ fn make_index_encoder(max_index: u64) -> Result<Vec<String>, Error> {
 }
 
 
+/*
+** RtSampleMaps is used to return two 'maps'.
+** I could use a tuple instead...
+*/
 struct RtSampleMaps {
   sample_index_to_sample_name_vec: Vec<String>,
   rt_index_to_sample_index_vec: Vec<usize>
@@ -498,7 +531,8 @@ struct RtSampleMaps {
 
 /*
 ** Make a struct of vectors that map sample indices to sample names and 
-** a vector that maps rt indices to sample indices.
+** a vector that maps rt indices to sample indices. Return the two maps
+** in an RtSampleMaps struct.
 */
 fn make_rt_sample_maps(sample_map_vec: Vec<SampleMap>) -> Result<RtSampleMaps, Error> {
   /*
@@ -564,6 +598,10 @@ fn make_rt_sample_maps(sample_map_vec: Vec<SampleMap>) -> Result<RtSampleMaps, E
 }
 
 
+/*
+** Open bam file writers and return as a vector or writers. The vector is
+** indexed by the sample indices, which are in rt_sample_maps.sample_index_to_sample_name_vec.
+*/
 fn open_bam_writers(rt_sample_maps: &RtSampleMaps, lane_index: usize, pcr7_index: usize, pcr5_index: usize, thread_pool: ThreadPool) -> Result<Vec<Box<rust_htslib::bam::Writer>>, Error> {
   let mut bam_out_vec: Vec<Box<rust_htslib::bam::Writer>> = Vec::new();
   let date = chrono::offset::Local::now();
@@ -596,6 +634,9 @@ pub fn u8_to_str(in_ru8: &[u8]) -> Result<&str, std::str::Utf8Error> {
 }
 
 
+/*
+** Process the cram files!
+*/
 fn process_cram(ucram_filename: String,
                 sample_map_vec: Vec<SampleMap>,
                 rt_to_index_map: HashMap<String, usize>,
@@ -774,7 +815,6 @@ fn process_cram(ucram_filename: String,
   println!("  total: {}", read_total);
   println!("");
 
-
   Ok(())
 }
 
@@ -806,7 +846,7 @@ fn main() {
   println!("");
 
   /*
-  ** Read samplesheet and get 'lane' samples.
+  ** Read samplesheet and get samples for this 'lane' and PCR pair.
   */
   let lane: usize = 1;
   let sample_map_vec: Vec<SampleMap> = get_input_file_samples(&samplesheet_filename, lane, pcr7_index, pcr5_index).unwrap();
@@ -817,6 +857,9 @@ fn main() {
   let rt_to_index_map  = make_barcode_map(&sample_map_vec, "rt_file", &default_rt_filename).expect("unable to read RT barcode file");
   let lig_to_index_map = make_barcode_map(&sample_map_vec, "ligation_file", &default_lig_filename).expect("unable to read ligation barcode file");
 
+  /*
+  ** Process the input cram files.
+  */
   process_cram(ucram_filename, sample_map_vec, rt_to_index_map, lig_to_index_map, lane_index, pcr7_index, pcr5_index, number_threads).expect("bad status: process_cram");
 
 }
