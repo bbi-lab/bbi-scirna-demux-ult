@@ -48,11 +48,6 @@ fn set_cl_options() -> Result<clap::Command, Box<dyn std::error::Error>> {
                   .short('i')
                   .long("ucram_file")
                   .help("Input Ultima ucram file path."))
-        .arg(Arg::new("ubam_file")  // required=true, no default
-                  .required(true)
-                  .short('o')
-                  .long("ubam_file")
-                  .help("Output ubam file path."))
         .arg(Arg::new("sample_sheet")   // required=true, no default
                   .required(true)
                   .short('s')

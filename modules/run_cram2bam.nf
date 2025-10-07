@@ -1,36 +1,36 @@
 def demux_out = params.output_dir + '/demux_out'
-def demux_log = params.output_dir + '/demux_log'
 
 
 process run_cram2bam {
   cache 'lenient'
 
   publishDir path: "${demux_out}", pattern: "*.bam", mode: 'copy'
-  publishDir path: "${demux_log}", pattern: "*.json", mode: 'copy'
 
   input:
-  tuple path(fastq_read1), path(fastq_read2)
-  val(samplesheet_file)
-  val(rt_file)
-  val(ligation_file)
+  tuple val(cram_file_in), val(lane_index), val(pcr7_index), val(pcr5_index)
+  val(samplesheet_file_in)
+  val(rt_barcode_file_in)
+  val(ligation_barcode_file_in)
+  val(number_threads)
 
   output:
   path("*.bam")
-  path("*.json")
 
   script:
   """
   # bash watch for errors
   set -ueo pipefail
 
-  $workflow.projectDir/bin/cram2bam -1 $fastq_read1 \
-                                           -2 $fastq_read2 \
-                                           -s $samplesheet_file \
-                                           -r $rt_file \
-                                           -l $ligation_file \
-                                           -f bam \
-                                           --recipe ${params.recipe} \
-                                           --ncpu 3
+  echo "cram_file: ${cram_file_in}"
+
+  $workflow.projectDir/bin/cram2bam -i ${cram_file_in} \
+                                    -s ${samplesheet_file_in} \
+                                    -r ${rt_barcode_file_in} \
+                                    -l ${ligation_barcode_file_in} \
+                                    --lane_index ${lane_index} \
+                                    -7 ${pcr7_index} \
+                                    -5 ${pcr5_index} \
+                                    -t ${number_threads}
   """
 }
 

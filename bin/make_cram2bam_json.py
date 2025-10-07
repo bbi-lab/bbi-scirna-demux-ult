@@ -83,15 +83,19 @@ def get_data_file_dict(json_data):
 def make_data_file_json(data_file_dict, cram_file_dir):
   cram2bam_list = []
   for pcr_pair in data_file_dict.keys():
-    merge_dict = {}
-    (iplate, irow, icol) = index2well_by_col(pcr_pair[1])
-    well = '%02d%s' % (icol+1, 'ABDCDEFGH'[irow])
-    root_file = 'PB-%s-Z%04d' % (well, pcr_pair[1])
-    in_file = '%s/%s.ucram' % (cram_file_dir, root_file)
-    in_path = os.path.join(cram_file_dir, in_file) 
-    merge_dict['root_file'] = root_file
-    merge_dict['in_file'] = in_path
-    cram2bam_list.append(merge_dict)
+    for lane_index in data_file_dict[pcr_pair].keys():
+      merge_dict = {}
+      (iplate, irow, icol) = index2well_by_col(pcr_pair[1])
+      well = '%02d%s' % (icol+1, 'ABCDEFGH'[irow])
+      root_file = 'PB-%s-Z%04d' % (well, pcr_pair[1])
+      in_file = '%s/%s.ucram' % (cram_file_dir, root_file)
+      in_path = os.path.join(cram_file_dir, in_file) 
+      merge_dict['root_file'] = root_file
+      merge_dict['in_file'] = in_path
+      merge_dict['lane_index'] = lane_index
+      merge_dict['pcr7_index'] = pcr_pair[0]
+      merge_dict['pcr5_index'] = pcr_pair[1]
+      cram2bam_list.append(merge_dict)
 
   try:
     filename_json = 'cram2bam.json'
