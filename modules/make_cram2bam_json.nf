@@ -11,7 +11,7 @@ process make_cram2bam_json {
   # bash watch for errors
   set -ueo pipefail
 
-  $workflow.projectDir/bin/make_cram2bam_json.py -i $samplesheet_file -p $cram_dir
+  $workflow.projectDir/bin/make_cram2bam_json.py -i ${samplesheet_file} -d ${cram_dir}
   """
 }
 

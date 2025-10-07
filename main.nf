@@ -15,7 +15,7 @@ params.bin_dir = workflow.projectDir + '/bin'
 ** Default barcode file paths.
 */
 params.rt_barcode_file_default = "$workflow.projectDir/data/rt.txt"
-params.ligation_barcode_file_default = "$workflow.projectDir/data/ligation.txt"
+params.ligation_barcode_file_default = "$workflow.projectDir/data/ligation_megasci.row_sorted.tsv"
 
 
 /*
@@ -38,7 +38,7 @@ include {make_cram2bam_json} from './modules/make_cram2bam_json.nf'
 def run_cram2bam_closure = {
   item ->
     def root_file = item['root_file']
-    def in_fil = item['in_file']
+    def in_file = item['in_file']
     [root_file, in_file]
 }
 
