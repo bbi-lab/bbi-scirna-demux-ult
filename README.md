@@ -60,6 +60,18 @@ This is a bit lengthy at this time. The steps are
 - run *bbi-scirna-demux/samplesheet/samplesheet_scrunch.py* on a samplesheet CSV file that is suitable for the *bbi-dmux* pipeline. In the simplest case, the input file has one row per RT well and the output CSV file has one row per sample. *samplesheet_scrunch.py* also adds columns that give the PCR primer wells or columns and rows. Run *samplesheet_scrunch.py --help* command for more information.
 - run *bbi-scirna-demux/samplesheet/scirna_samplesheet.py* to convert the scrunched CSV file to a JSON file. *scirna_samplesheet.py* requires a command line parameter that gives the number of lanes used in the sequencing run. Run *scirna_samplesheet.py -d* for detailed documentation. (At this early stage of the program's life, there may be omissions and errors in the documentation.) You may need to edit the scrunched CSV file in a spreadsheet program in order to add columns described in the *scirna_samplesheet.py* documentation.
 
+###
+
+Run the Ultima trimmer on the raw Ultima cram files. The trimmer program runs from a Docker container. See the Ultima trimmer documentation. There is additional documentation in our git repository bbi-ultima/ultima-trimmer. There is a bash script that runs the trimmer in the git repository
+
+  bbi-ultima/ultima-trimmer/run_trimmer.sh
+
+Use the script
+
+  bbi-scirna-demux-ult/scripts/make_cram_symlinks.sh
+
+to make symbolic links to the trimmer cram files. This bbi-scirna-demux-ult pipeline looks for cram files that have the symlink filenames.
+
 ### Run *bbi-scirna-demux-ult*
 
 Use the *run.demux.sh* bash script to start the pipeline run.
