@@ -97,8 +97,8 @@ def make_data_file_json(data_file_dict, cram_file_dir):
       merge_dict = {}
       (iplate, irow, icol) = index2well_by_col(pcr_pair[1])
       well = '%02d%s' % (icol+1, 'ABCDEFGH'[irow])
-      root_file = 'PB-%s-Z%04d' % (well, pcr_pair[1])
-      in_file = '%s.ucram' % (root_file)
+      root_file = 'symlink-%03d-Z%04d' % (lane_index, pcr_pair[1])
+      in_file = '%s.trim.cram' % (root_file)
       in_path = os.path.join(cram_file_dir, in_file) 
       merge_dict['root_file'] = root_file
       merge_dict['in_file'] = in_path
