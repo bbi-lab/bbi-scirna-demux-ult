@@ -54,8 +54,6 @@ workflow {
   make_cram2bam_json(samplesheet_file, ultima_cram_dir)
   make_cram2bam_json.out.splitJson().map{run_cram2bam_closure(it)}.set{run_cram2bam_in}
  
-run_cram2bam_in.view()
-
   run_cram2bam(run_cram2bam_in, samplesheet_file, rt_barcode_file_default, ligation_barcode_file_default, number_threads_cram2bam)
 }
 
