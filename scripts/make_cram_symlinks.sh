@@ -9,4 +9,6 @@ for cram in $lcram
 do
   p5_id=`echo ${cram} | awk 'BEGIN{FS="-"}{print $4}'`
   echo "${in_dir}/symlink-${lane_id}-${p5_id}"
+  ln -s ${cram} ${in_dir}/symlink-${lane_id}-${p5_id}
+  echo
 done
