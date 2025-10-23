@@ -168,7 +168,7 @@ fn make_rt_index_to_well_map(max_num_plates: usize) -> Result<Vec<String>, Error
   rt_index_to_well_map.push("Undetermined".to_string());
   for well_index in (1..(max_num_plates * 96 + 1)) {
     let (ipl, well_string) = index_to_well(well_index, true).unwrap();
-    let well_name = format!("P{:02}_{}", ipl, well_string);
+    let well_name = format!("P{:02}-{}", ipl, well_string);
     rt_index_to_well_map.push(well_name);
   }
 
