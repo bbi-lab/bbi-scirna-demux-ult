@@ -698,7 +698,7 @@ fn process_cram(ucram_filename: String,
   }
   let mut p5_well_name: String = String::new();
   if(pcr5_index > 0) {
-    let (ipl, p5_well) = index_to_well(pcr5_index, true).unwrap();
+    let (ipl, p5_well) = index_to_well(pcr5_index, false).unwrap();
     p5_well_name = format!("P{:02}-{}", ipl, p5_well);
   }
   else {
