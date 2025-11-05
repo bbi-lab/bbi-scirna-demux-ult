@@ -19,6 +19,7 @@ use rust_htslib::errors::Error;
 use rust_htslib::bam::{Read, Reader};
 use rust_htslib::bam::record::Aux;
 use rust_htslib::tpool::ThreadPool;
+use rust_htslib::bam::HeaderView;
 use csv::{ReaderBuilder, Trim};
 use serde::Deserialize;
 use base_custom::BaseCustom;
@@ -602,7 +603,7 @@ fn make_rt_sample_maps(sample_map_vec: Vec<SampleMap>) -> Result<RtSampleMaps, E
 ** Open bam file writers and return as a vector or writers. The vector is
 ** indexed by the sample indices, which are in rt_sample_maps.sample_index_to_sample_name_vec.
 */
-fn open_bam_writers(rt_sample_maps: &RtSampleMaps, lane_index: usize, pcr7_index: usize, pcr5_index: usize, thread_pool: ThreadPool) -> Result<Vec<Box<rust_htslib::bam::Writer>>, Error> {
+fn open_bam_writers(rt_sample_maps: &RtSampleMaps, lane_index: usize, pcr7_index: usize, pcr5_index: usize, ucram_filename: &String, ucram_header: &HeaderView, thread_pool: ThreadPool) -> Result<Vec<Box<rust_htslib::bam::Writer>>, Error> {
   let mut bam_out_vec: Vec<Box<rust_htslib::bam::Writer>> = Vec::new();
   let date = chrono::offset::Local::now();
 
@@ -613,10 +614,15 @@ fn open_bam_writers(rt_sample_maps: &RtSampleMaps, lane_index: usize, pcr7_index
                                pcr7_index,
                                pcr5_index,
                                lane_index);
-      let mut header = rust_htslib::bam::Header::new();
-      header.push_comment(b"Made by cram2bam");
-      header.push_comment(format!("cram2bam run date: {}", date.to_string()).as_bytes());
-      bam_out_vec.push(Box::new(rust_htslib::bam::Writer::from_path(filename.clone(), &header, rust_htslib::bam::Format::Bam).expect(&format!("Error: unable to open file {}", filename.clone()))));
+      let mut bam_header = rust_htslib::bam::Header::from_template(ucram_header);
+      let mut bam_header_record = rust_htslib::bam::header::HeaderRecord::new(&"PG".as_bytes());
+      bam_header_record.push_tag("ID".as_bytes(), "cram2bam.1");
+      bam_header_record.push_tag("PN".as_bytes(), "cram2bam");
+      bam_header_record.push_tag("VN".as_bytes(), env!("CARGO_PKG_VERSION"));
+      bam_header.push_record(&bam_header_record);
+      bam_header.push_comment(format!("cram2bam run date: {}", date.to_string()).as_bytes());
+      bam_header.push_comment(format!("cram input file {}", ucram_filename).as_bytes());
+      bam_out_vec.push(Box::new(rust_htslib::bam::Writer::from_path(filename.clone(), &bam_header, rust_htslib::bam::Format::Bam).expect(&format!("Error: unable to open file {}", filename.clone()))));
   } 
 
 
@@ -674,8 +680,13 @@ fn process_cram(ucram_filename: String,
   let mut cram_reader = Reader::from_path(ucram_filename.clone()).expect(&format!("Error: unable to open file {}", ucram_filename.clone()));
   cram_reader.set_thread_pool(&thread_pool).unwrap();
 
+  /*
+  ** Read input cram file header.
+  */
+  let ucram_header = cram_reader.header();
+
   let rt_sample_maps = make_rt_sample_maps(sample_map_vec).unwrap();
-  let mut bam_writer_vec = open_bam_writers(&rt_sample_maps, lane_index, pcr7_index, pcr5_index, thread_pool).unwrap();
+  let mut bam_writer_vec = open_bam_writers(&rt_sample_maps, lane_index, pcr7_index, pcr5_index, &ucram_filename, ucram_header, thread_pool).unwrap();
 
   let sample_index_to_sample_name_vec = rt_sample_maps.sample_index_to_sample_name_vec;
   let rt_index_to_sample_index_vec = rt_sample_maps.rt_index_to_sample_index_vec;
