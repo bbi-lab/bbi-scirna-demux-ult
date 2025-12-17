@@ -37,6 +37,26 @@ cp target/release/cram2bam ../../bin
 
 I recommend that you build *cram2bam* on a newer cluster node, for example, s020 on the Shendure cluster.
 
+## Make symbolic links to the trimmer CRAM files
+
+This *bbi-scirna-demux-ult* pipeline expects input CRAM files with standard names. The name format is
+
+```
+symlink-<lane_number>-<P5_index_id>.trim.cram
+```
+
+For example, *symlink-001-Z0140.trim.cram*. The P5 index id starts with 'Z' followed by a 4 digit integer for the index.
+
+This respository includes the bash script *scripts/make_cram_symlinks.sh* for making symbolic links to the trimmed CRAM files where the symbolic link names have the format described above. You will need to edit the file to set the shell variables
+
+<ul>
+<li>lane_id [use a 3-digit integer, starting with 001, for the CRAM files from each wafer]</li>
+<li>in_dir [path to the directory that has the trimmer CRAM files]</li>
+<li>lcram [a command string to select the CRAM files from the wafer]</li>
+</ul>
+
+The *lcram* command string will need to include the wafer id in order to select CRAM files from the wafer. The symbolic links are made in the *in_dir* directory.
+
 ## Run *bbi-scirna-demux-ult*
 
 I recommend that you use the *run.demux.sh* script in this repository. You must edit the script to use the correct Nextflow program and Nextflow main.nf script.
@@ -51,7 +71,8 @@ params.ultima_cram_dir
 params.output_dir
 ```
 
-*params.samplesheet_json* is the path to your samplesheet JSON file for the run. *params.ultima_cram_dir* is the path to the directory that contains the Ultima filtered CRAM files, and *params.output_dir* is the path to the directory where the processing output is written to.
+*params.samplesheet_json* is the path to your samplesheet JSON file for the run. *params.ultima_cram_dir* is the path to the directory that contains symbolic links to the Ultima filtered CRAM files, and *params.output_dir* is the path to the directory where the data are processed. The output BAM files are written to the directory *$params.output_dir/demux_out*.
+
 
 ### Make the samplesheet JSON file.
 
