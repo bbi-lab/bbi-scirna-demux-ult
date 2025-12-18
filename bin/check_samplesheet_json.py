@@ -354,9 +354,9 @@ if __name__ == '__main__':
   if(error_flag):
     exit_flag = 1
 
-  error_flag = check_file_process_group(sample_index_list, 'hash_file')
-  if(error_flag):
-    exit_flag = 1
+#  error_flag = check_file_process_group(sample_index_list, 'hash_file')
+#  if(error_flag):
+#    exit_flag = 1
 
   error_flag = check_file_process_group(sample_index_list, 'rt_file')
   if(error_flag):

@@ -859,8 +859,7 @@ fn main() {
   /*
   ** Read samplesheet and get samples for this 'lane' and PCR pair.
   */
-  let lane: usize = 1;
-  let sample_map_vec: Vec<SampleMap> = get_input_file_samples(&samplesheet_filename, lane, pcr7_index, pcr5_index).unwrap();
+  let sample_map_vec: Vec<SampleMap> = get_input_file_samples(&samplesheet_filename, lane_index, pcr7_index, pcr5_index).unwrap();
 
   /*
   ** Make RT and ligation barcode to well maps.
