@@ -4,7 +4,7 @@
 
 This *bbi-scirna-demux-ult* pipeline runs a *cram2bam* program to make *.bam* files from Ultima filtered UCRAM files.
 
-## Summary
+## Summary of Ultima data processing.
 
 1. download the raw Ultima CRAM files
 2. run the Ultima trimmer on the raw Ultima CRAM files: see the *bbi-ultima* repo
