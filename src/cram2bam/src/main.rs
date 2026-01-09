@@ -461,6 +461,14 @@ fn make_barcode_map(sample_map_vec: &Vec<SampleMap>, barcode_type: &str, default
     file_name = default_filename.to_string();
   }               
 
+  if(barcode_type == "rt_file") {
+    println!("use rt file:  {}", file_name);
+  }
+  else
+  if(barcode_type == "ligation_file") {
+    println!("use lig file: {}", file_name);
+  }
+
   let barcode_well_map = read_barcode_file(&file_name).unwrap();
 
   /*
@@ -752,8 +760,15 @@ fn process_cram(ucram_filename: String,
     // tag UM: UMI sequence
     let Aux::String(umi_seq_string) = record_in.aux(umi_u8).unwrap() else {panic!("")};
 
+/*
+** Add useful message to panic on missing key.
+**
     let rt_index  = rt_to_index_map[rt_barcode];
     let lig_index = lig_to_index_map[lig_barcode];
+*/
+    let rt_index  = *rt_to_index_map.get(rt_barcode).expect("\n**** Error: unrecognized RT barcode sequence. Are you using the correct RT barcode file? ****\n");
+    let lig_index = *lig_to_index_map.get(lig_barcode).expect("\n**** Error: unrecognized ligation barcode sequence. Are you using the correct ligation barcode file? ****\n");
+
     let rt_index_encoded = &index_encoder[rt_index];
     let lig_index_encoded = &index_encoder[lig_index];
 
@@ -866,6 +881,7 @@ fn main() {
   */
   let rt_to_index_map  = make_barcode_map(&sample_map_vec, "rt_file", &default_rt_filename).expect("unable to read RT barcode file");
   let lig_to_index_map = make_barcode_map(&sample_map_vec, "ligation_file", &default_lig_filename).expect("unable to read ligation barcode file");
+  println!("");
 
   /*
   ** Process the input cram files.
