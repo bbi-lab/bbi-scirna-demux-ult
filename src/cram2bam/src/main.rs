@@ -642,6 +642,51 @@ fn open_bam_writers(rt_sample_maps: &RtSampleMaps, lane_index: usize, pcr7_index
 }
 
 
+/*
+** Open tsv file writers for storing hash read information as a vector
+** of writers. The vector is indexed by the sample indices, which are in
+** rt_sample_maps.sample_index_to_sample_name_vec.
+*/
+fn open_hash_writers(rt_sample_maps: &RtSampleMaps, lane_index: usize, pcr7_index: usize, pcr5_index: usize) -> Result<Vec<csv::Writer<std::fs::File>>, Error> {
+  let mut hash_reads_out_vec: Vec<csv::Writer<std::fs::File>> = Vec::new();
+
+  for i in 0..(rt_sample_maps.sample_index_to_sample_name_vec.len()) {
+    let filename: String = format!("{}-{:03}_{:03}_{:03}-L{:03}.hash_reads.tsv",
+                           rt_sample_maps.sample_index_to_sample_name_vec[i],
+                           lane_index,
+                           pcr7_index,
+                           pcr5_index,
+                           lane_index);
+    let fh = std::fs::File::create(&filename).expect(&format!("Error: unable to open file {}", filename.clone()));
+    let mut tsv_writer = csv::WriterBuilder::new()
+                                .delimiter(b'\t')
+                                .from_writer(fh);
+
+    /*
+    ** Write header.
+    */
+    tsv_writer.write_record(["read_name", "encoded_read_barcode", "rt_barcode", "lig_barcode", "hash_sequence"]).expect(&format!("Error: unable to writer header to {}", filename.clone()));
+
+    /*
+    ** Store writer in vector.
+    */
+    hash_reads_out_vec.push(tsv_writer);
+  }
+
+  Ok(hash_reads_out_vec)
+}
+
+
+/*
+** Flush hash writers.
+*/
+fn flush_hash_writers(mut hash_reads_out_vec: Vec<csv::Writer<std::fs::File>>) -> () {
+  for i in 0..(hash_reads_out_vec.len()) {
+    hash_reads_out_vec[i].flush().expect("Error: unable to flush hash read writers");
+  }
+}
+
+
 #[inline]
 pub fn u8_to_str(in_ru8: &[u8]) -> Result<&str, std::str::Utf8Error> {
   return(std::str::from_utf8(in_ru8));
@@ -696,6 +741,8 @@ fn process_cram(ucram_filename: String,
   let rt_sample_maps = make_rt_sample_maps(sample_map_vec).unwrap();
   let mut bam_writer_vec = open_bam_writers(&rt_sample_maps, lane_index, pcr7_index, pcr5_index, &ucram_filename, ucram_header, thread_pool).unwrap();
 
+  let mut hash_reads_out_vec = open_hash_writers(&rt_sample_maps, lane_index, pcr7_index, pcr5_index).unwrap();
+
   let sample_index_to_sample_name_vec = rt_sample_maps.sample_index_to_sample_name_vec;
   let rt_index_to_sample_index_vec = rt_sample_maps.rt_index_to_sample_index_vec;
 
@@ -732,8 +779,13 @@ fn process_cram(ucram_filename: String,
   #[allow(unused_assignments)]
   let mut sample_name: String = String::new();
 
+  let mut hash_read_flag: bool = false;
+  let mut hash_barcode: String = String::new();
+
   let mut read_length_counter: Vec<u64> = vec!(0_u64; MAX_READ_LENGTH+1);
   let mut undetermined_counter: u64 = 0;
+  let mut insert_read_counter: u64 = 0;
+  let mut hash_read_counter: u64 = 0;
 
   /*
   ** Process cram records.
@@ -759,6 +811,20 @@ fn process_cram(ucram_filename: String,
     let Aux::String(lig_barcode) = record_in.aux(ba_u8).unwrap() else {panic!("")};
     // tag UM: UMI sequence
     let Aux::String(umi_seq_string) = record_in.aux(umi_u8).unwrap() else {panic!("")};
+
+    /*
+    ** tag ho: hash barcode. This does not exist for reads with inserts.
+    */
+    match record_in.aux(b"ho") {
+      Ok(value) => {
+        hash_read_flag = true;
+        let Aux::String(hash_barcode_tmp) = value else {panic!("")};
+        hash_barcode = hash_barcode_tmp.to_string();
+      }
+      Err(_e) => {
+        hash_read_flag = false;
+      }
+    }
 
 /*
 ** Add useful message to panic on missing key.
@@ -799,7 +865,7 @@ fn process_cram(ucram_filename: String,
                                                   p7_index_encoded,
                                                   p5_index_encoded);
 
-    {
+    if(!hash_read_flag) {
       let mut record_out: rust_htslib::bam::Record = rust_htslib::bam::Record::new();
 
       let seq = record_in.seq().as_bytes();
@@ -816,12 +882,26 @@ fn process_cram(ucram_filename: String,
       record_out.push_aux("UY".as_bytes(), rust_htslib::bam::record::Aux::String("CCCCCCCC")).expect("Error: unable to add barcode quality values to BAM record tags.");
 
       bam_writer_vec[sample_index].write(&record_out).expect("Error: unable to write record to BAM file.");
+
+      insert_read_counter += 1;
+
+    } else {
+      hash_reads_out_vec[sample_index].write_record([read_name, cell_barcode_string, rt_barcode.to_string(), lig_barcode.to_string(), hash_barcode.clone()]).expect(&format!("Error: unable to writer hash read record."));
+
+      hash_read_counter += 1;
+
     }
   }
+
+
+  flush_hash_writers(hash_reads_out_vec);
+
 
   println!("cram2bam");
   println!("  number of cram records processed: {}", nrecord);
   println!("  number of undetermined reads:     {}", undetermined_counter);
+  println!("  number of insert reads:           {}", insert_read_counter);
+  println!("  number of hash reads:             {}", hash_read_counter);
   println!("");
   println!("  read length distribution");
   println!("  length       reads");

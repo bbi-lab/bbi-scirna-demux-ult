@@ -5,6 +5,7 @@ process run_cram2bam {
   cache 'lenient'
 
   publishDir path: "${demux_out}", pattern: "*.bam", mode: 'copy'
+  publishDir path: "${demux_out}", pattern: "*.tsv", mode: 'copy'
 
   input:
   tuple val(cram_file_in), val(lane_index), val(pcr7_index), val(pcr5_index)
@@ -15,6 +16,7 @@ process run_cram2bam {
 
   output:
   path("*.bam")
+  path("*.tsv")
 
   script:
   """
