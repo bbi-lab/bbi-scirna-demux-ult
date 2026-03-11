@@ -665,7 +665,7 @@ fn open_hash_writers(rt_sample_maps: &RtSampleMaps, lane_index: usize, pcr7_inde
     /*
     ** Write header.
     */
-    tsv_writer.write_record(["read_name", "encoded_read_barcode", "rt_barcode", "lig_barcode", "hash_sequence"]).expect(&format!("Error: unable to writer header to {}", filename.clone()));
+    tsv_writer.write_record(["read_name", "encoded_read_barcode", "rt_barcode", "lig_barcode", "umi_sequence", "hash_sequence"]).expect(&format!("Error: unable to writer header to {}", filename.clone()));
 
     /*
     ** Store writer in vector.
@@ -886,7 +886,7 @@ fn process_cram(ucram_filename: String,
       insert_read_counter += 1;
 
     } else {
-      hash_reads_out_vec[sample_index].write_record([read_name, cell_barcode_string, rt_barcode.to_string(), lig_barcode.to_string(), hash_barcode.clone()]).expect(&format!("Error: unable to writer hash read record."));
+      hash_reads_out_vec[sample_index].write_record([read_name, cell_barcode_string, rt_barcode.to_string(), lig_barcode.to_string(), umi_seq_string.to_string(), hash_barcode.clone()]).expect(&format!("Error: unable to writer hash read record."));
 
       hash_read_counter += 1;
 
