@@ -7,7 +7,7 @@ NEXTFLOW="/net/gs/vol1/home/bge/src/nextflow/nextflow.25.10.2.10555"
 
 #
 # Edit the MAIN_NF path to the main.nf file in your
-# bbi-scirna-demux installation.
+# bbi-scirna-demux-ult installation.
 #
 MAIN_NF="/net/gs/vol1/home/bge/git/bbi-scirna-demux-ult/main.nf"
 

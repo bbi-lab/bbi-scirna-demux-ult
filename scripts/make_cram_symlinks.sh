@@ -4,7 +4,7 @@
 # Make symlinks to trimmed Ultima CRAM files.
 #
 # Notes:
-#   o  the trimmed Ultima CRAM file name format may varies
+#   o  the trimmed Ultima CRAM file name format may vary
 #      run-to-run
 #   o  the bbi-scirna-demux-ult pipeline expects that input 
 #      CRAM files have a standard name
