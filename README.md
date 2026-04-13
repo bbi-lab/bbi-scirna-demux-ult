@@ -2,24 +2,22 @@
 
 ## Intro
 
-This *bbi-scirna-demux-ult* pipeline runs a *cram2bam* program to make *.bam* files from Ultima filtered UCRAM files.
+This *bbi-scirna-demux-ult* pipeline runs a *cram2bam* program to make *.bam* files of insert sequences and *.tsv* files of hash sequences from Ultima filtered CRAM file. This pipeline is optimized for experiments with hash reads: use the repository branch called *hash_match*.
 
-## Summary of Ultima data processing.
-
-1. download the raw Ultima CRAM files
+1. download the raw Ultima CRAM files: see notes in *billion_cells_project_information* repo
 2. run the Ultima trimmer on the raw Ultima CRAM files: see the *bbi-ultima* repo
 3. make symbolic links to the trimmed CRAM files: see the *bbi-scirna-demux-ult* repo
-4. make a sampleheet JSON file: see thhe *bbi-scirna-demux/samplesheet* repo
-5. make an experiment.config file: see the *bbi-scirna-demux-ult* repo
+4. make a sampleheet JSON file: see the *bbi-scirna-demux/samplesheet* repo
+5. make an *experiment.config* file: see the *bbi-scirna-demux-ult* repo
 6. run the *bbi-scirna-demux-ult* pipeline: see the *bbi-scirna-demux-ult* repo
-7. run the *bbi-scirna-analyze* pipeline: see the *bbi-scirna-analyze* repo
+7. run the *bbi-scirna-analyze-ult* pipeline: see the *bbi-scirna-analyze-ult* repo
 
 ## Installation
 
 Install the following software
 
-- Nextflow: this pipeline uses Nextflow DSL2 so you must install a recent version of Nextflow. I use version 24.10.2 successfully. If you need to run the *bbi-dmux* and *bbi-sci* pipelines too, you will need two different Nextflow version so install the new Nextflow in its own location because the recent versions no longer support DSL1.
-- Rust: the *cram2bam* program is written in Rust so you must install the Rust compiler.
+- Nextflow: this pipeline uses Nextflow DSL2 so you must install a recent version of Nextflow. I use version 24.10.2 successfully. Note:if you need to run the *bbi-dmux* and *bbi-sci* pipelines too, you will need two different Nextflow version. In this case install the new Nextflow in its own location because the recent versions required for *bbi-scirna-demux-ult* no longer support DSL1, which is required by the bbi-dmux* and *bbi-sci* pipelines.
+- Rust: the *cram2bam* program is written in Rust so you must install the Rust compiler if you need to build its executable.
 - cram2bam: this program is a compiled program written in Rust so it must be compiled and the executable copied to the *bbi-scirna-demux-ult/bin* directory. The *bbi-scirna-demux-ult/bin* directory has a *cram2bam* executable that was made on a shendure GS-IT node so you will not need to compile it unless the executable fails to run on your system.
 - python3 interpreter: I use version 3.12.1 successfully.
 
@@ -78,15 +76,13 @@ Edit *experiment.config* to set the following parameters for your run:
 
 The file *bbi-scirna-demux/samplesheet/scirna_samplesheet.py* has detailed information for making a samplesheet JSON file. The steps are
 
-- run *bbi-scirna-demux/samplesheet/lims2scrunch.py* on a LIMS CSV manifest file to make a CSV samplesheet file where each row describes a sample. Run *lims2scrunch.py --help* command for more information.
-- run *bbi-scirna-demux/samplesheet/samplesheet_scrunch.py* on a samplesheet CSV file that is suitable for the *bbi-dmux* pipeline. In the simplest case, the input file has one row per RT well and the output CSV file has one row per sample. *samplesheet_scrunch.py* also adds columns that give the PCR primer wells or columns and rows. Run *samplesheet_scrunch.py --help* command for more information.
-- run *bbi-scirna-demux/samplesheet/scirna_samplesheet.py* to convert the scrunched CSV file to a JSON file. *scirna_samplesheet.py* requires a command line parameter that gives the number of lanes used in the sequencing run. Run *scirna_samplesheet.py -d* for detailed documentation. (At this early stage of the program's life, there may be omissions and errors in the documentation.) You may need to edit the scrunched CSV file in a spreadsheet program in order to add columns described in the *scirna_samplesheet.py* documentation.
+- run *bbi-scirna-demux/samplesheet/lims2scrunch.py* on a LIMS CSV manifest file to make a CSV samplesheet file where each row describes a sample. This program uses a parameters text file to fill in certain columns in the *.csv* file.Run *lims2scrunch.py --help* command for more information.
+- alternatively, run *bbi-scirna-demux/samplesheet/samplesheet_scrunch.py* on a samplesheet CSV file that is suitable for the *bbi-dmux* pipeline. In the simplest case, the input file has one row per RT well and the output CSV file has one row per sample. *samplesheet_scrunch.py* also adds columns that give the PCR primer wells or columns and rows. Run *samplesheet_scrunch.py --help* command for more information.
+- edit the scrunched *.csv* files as needed using a spreadsheet program. This is needed to add the hash barcode file paths, for example. See the scirna_samplesheet.py* program for information about the input *.csv* file format.
+- run *bbi-scirna-demux/samplesheet/scirna_samplesheet.py* to convert the scrunched, edited CSV file to a JSON file. *scirna_samplesheet.py* requires a command line parameter that gives the number of lanes used in the sequencing run. Run *scirna_samplesheet.py -d* for detailed documentation. (At this early stage of the program's life, there may be omissions and errors in the documentation.) 
 - the ligation barcode file for the standard and jumbo/mega sci experiments differ. Use the *bbi-scirna-demux-ult/data/ligation.txt* for standard sci and *bbi-scirna-demux-ult/data/ligation_megasci.row_sorted.tsv* for jumbo sci.
 
 ### Run *bbi-scirna-demux-ult*
 
 I recommend that you use the *run.demux.sh* script in this repository. You must edit the script to use the correct Nextflow program and Nextflow main.nf script.
 
-### Run *bbi-scirna-analyze
-
-For information about running the *bbi-scirna-analyze* pipeline, see *bbi-scirna-analyze/README.md*.
