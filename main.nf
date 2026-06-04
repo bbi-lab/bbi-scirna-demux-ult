@@ -42,6 +42,7 @@ def run_cram2bam_closure = {
     def lane_index = item['lane_index']
     def pcr7_index = item['pcr7_index']
     def pcr5_index = item['pcr5_index']
+
     [in_file, lane_index, pcr7_index, pcr5_index]
 }
 
