@@ -42,7 +42,7 @@ def run_cram2bam_closure = {
 ** Run pipeline.
 */
 workflow {
-  def samplesheet_file = channel.value(params.samplesheet_json)
+  def samplesheet_file = channel.value(file(params.samplesheet_json, checkIfExists: true))
   def ultima_cram_dir = channel.value(params.ultima_cram_dir)
   def rt_barcode_file_default = channel.value(params.rt_barcode_file_default)
   def ligation_barcode_file_default = channel.value(params.ligation_barcode_file_default)
