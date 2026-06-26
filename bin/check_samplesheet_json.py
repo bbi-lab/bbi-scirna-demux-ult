@@ -61,7 +61,7 @@ def expand_index_list(index_string):
     mobj = re.match(regex_pattern, index_spec)
     if(mobj == None):
       print('Error: expand_index_list: bad index specification: %s' % (index_spec))
-      sys.exit(-1)
+      sys.exit(1)
     index1 = int(mobj.group(1))
     index2 = index1
     if(mobj.group(2) != None):
@@ -141,7 +141,7 @@ def index_string_to_well_string( index_string, across_row_first, show_plate ):
     mobj = re.match( r'^([0-9]+)([-]([0-9]+))?$', item.strip() )
     if( mobj == None):
       print('Error: index_string_to_well_string: unable to parse index string', file=sys.stderr)
-      sys.exit(-1)
+      sys.exit(1)
     ipl, well = index_to_well(int( mobj.group( 1 ) ) - 1, across_row_first)
     if( ipl == 0 and not show_plate ):
       if( len( well_string ) > 0 ):

@@ -19,15 +19,6 @@ params.ligation_barcode_file_default = "$workflow.projectDir/data/ligation_megas
 params.number_threads_cram2bam = 4
 
 /*
-** Set up channels.
-*/
-samplesheet_file = channel.value(params.samplesheet_json)
-ultima_cram_dir = channel.value(params.ultima_cram_dir)
-rt_barcode_file_default = channel.value(params.rt_barcode_file_default)
-ligation_barcode_file_default = channel.value(params.ligation_barcode_file_default)
-number_threads_cram2bam = channel.value(params.number_threads_cram2bam)
-
-/*
 ** Import modules after defining params.* so that
 ** the parameters are accessible in the modules.
 */
@@ -51,6 +42,12 @@ def run_cram2bam_closure = {
 ** Run pipeline.
 */
 workflow {
+  def samplesheet_file = channel.value(file(params.samplesheet_json, checkIfExists: true))
+  def ultima_cram_dir = channel.value(params.ultima_cram_dir)
+  def rt_barcode_file_default = channel.value(params.rt_barcode_file_default)
+  def ligation_barcode_file_default = channel.value(params.ligation_barcode_file_default)
+  def number_threads_cram2bam = channel.value(params.number_threads_cram2bam)
+
   run_check_samplesheet(samplesheet_file)
   make_cram2bam_json(samplesheet_file, ultima_cram_dir)
   make_cram2bam_json.out.splitJson().map{run_cram2bam_closure(it)}.set{run_cram2bam_in}
