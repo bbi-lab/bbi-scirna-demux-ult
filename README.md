@@ -2,7 +2,7 @@
 
 ## Intro
 
-This *bbi-scirna-demux-ult* pipeline runs a *cram2bam* program to make *.bam* files of insert sequences and *.tsv* files of hash sequences from Ultima filtered CRAM file. This pipeline is optimized for experiments with hash reads: use the repository branch called *hash_match*.
+This *bbi-scirna-demux-ult* pipeline runs a *cram2bam* program to make *.bam* files of insert sequences and *.tsv* files of hash sequences from Ultima filtered CRAM file. This pipeline is optimized for experiments with hash reads: use the repository branch called *main*.
 
 ## Summary of Ultima data processing
 
