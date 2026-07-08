@@ -2,6 +2,7 @@ process make_cram2bam_json {
   input:
   path(samplesheet_file)
   val(cram_dir)
+  val(done_flag)
 
   output:
   path("cram2bam.json")
