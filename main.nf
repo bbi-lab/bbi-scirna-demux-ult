@@ -49,7 +49,8 @@ workflow {
   def number_threads_cram2bam = channel.value(params.number_threads_cram2bam)
 
   run_check_samplesheet(samplesheet_file)
-  make_cram2bam_json(samplesheet_file, ultima_cram_dir)
+  run_check_samplesheet.out.done_flag.set{check_done}
+  make_cram2bam_json(samplesheet_file, ultima_cram_dir, check_done)
   make_cram2bam_json.out.splitJson().map{run_cram2bam_closure(it)}.set{run_cram2bam_in}
  
   run_cram2bam(run_cram2bam_in, samplesheet_file, rt_barcode_file_default, ligation_barcode_file_default, number_threads_cram2bam)

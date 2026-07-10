@@ -88,3 +88,8 @@ The file *bbi-scirna-demux/samplesheet/scirna_samplesheet.py* has detailed infor
 
 I recommend that you use the *run.demux.sh* script in this repository. You must edit the script to use the correct Nextflow program and Nextflow main.nf script.
 
+## Notes
+
+- the samplesheet.json file includes a list of lanes to which each sample is applied. If you make a samplesheet.json file for a machine with one lane and later run the library on a machine with a differen
+t number of lanes, you must regenerate the samplesheet.json file.
+
